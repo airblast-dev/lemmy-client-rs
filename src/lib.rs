@@ -23,14 +23,13 @@
 use std::collections::HashMap;
 
 use crate::{lemmy_client_trait::LemmyClientInternal, response::LemmyResult};
-use cfg_if::cfg_if;
 use lemmy_api_common::{
     comment::*, community::*, custom_emoji::*, lemmy_db_schema::source::login_token::LoginToken,
     person::*, post::*, private_message::*, site::*, SuccessResponse,
 };
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(not(target_family = "wasm"))]
 use lemmy_client_internal::ClientWrapper;
-#[cfg(target_arch = "wasm32")]
+#[cfg(target_family = "wasm")]
 use lemmy_client_internal::Fetch;
 
 mod error;
@@ -77,17 +76,18 @@ impl LemmyClient {
     /// });
     /// ```
     pub fn new(options: ClientOptions) -> Self {
-        cfg_if! {
-            if #[cfg(target_arch = "wasm32")] {
-                Self {
-                    client: Fetch::new(options),
-                    headers: HashMap::new()
-                }
-            } else {
-                Self {
-                    client: ClientWrapper::new(options),
-                    headers: HashMap::new()
-                }
+        #[cfg(target_family = "wasm")]
+        {
+            Self {
+                client: Fetch::new(options),
+                headers: HashMap::new(),
+            }
+        }
+        #[cfg(not(target_family = "wasm"))]
+        {
+            Self {
+                client: ClientWrapper::new(options),
+                headers: HashMap::new(),
             }
         }
     }
