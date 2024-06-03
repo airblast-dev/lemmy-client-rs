@@ -81,7 +81,7 @@ mod goober {
             .with_headers(headers)
             .maybe_with_jwt(jwt);
 
-            #[cfg(all(feature = "leptos", target_arch = "wasm32"))]
+            #[cfg(all(feature = "leptos", target_family = "wasm"))]
             {
                 use web_sys::AbortController;
                 let abort_controller = AbortController::new().ok();

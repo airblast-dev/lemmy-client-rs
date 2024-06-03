@@ -12,14 +12,14 @@ impl Error {
     }
 }
 
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(not(target_family = "wasm"))]
 impl From<reqwest::Error> for Error {
     fn from(e: reqwest::Error) -> Self {
         Self(e.to_string())
     }
 }
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(target_family = "wasm")]
 impl From<gloo_net::Error> for Error {
     fn from(e: gloo_net::Error) -> Self {
         Self(e.to_string())

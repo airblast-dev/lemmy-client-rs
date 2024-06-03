@@ -47,9 +47,9 @@ pub use utils::ClientOptions;
 /// API wrapper for lemmy
 pub struct LemmyClient {
     headers: HashMap<String, String>,
-    #[cfg(target_arch = "wasm32")]
+    #[cfg(target_family = "wasm")]
     client: Fetch,
-    #[cfg(not(target_arch = "wasm32"))]
+    #[cfg(not(target_family = "wasm"))]
     client: ClientWrapper,
 }
 
