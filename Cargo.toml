@@ -27,4 +27,4 @@ serde_urlencoded = "0.7"
 web-sys = "0.3"
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
-reqwest = { version="0.12.4", default-features=false, features=["native-tls", "json"] }
+reqwest = { version="0.12.4", default-features=false, features=["default-tls", "json", "http2"] }
