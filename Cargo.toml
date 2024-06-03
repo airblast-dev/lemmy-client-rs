@@ -12,10 +12,10 @@ categories = ["api-bindings", "wasm"]
 
 [dependencies]
 lemmy_api_common = { version="0.19.3" }
-serde = "1.0"
 http = "1.1.0"
 thiserror = "1.0.61"
 leptos = { version="0.6.12", optional=true }
+serde = "1.0.203"
 
 [features]
 default = []
