@@ -186,14 +186,13 @@ mod goober {
             let LemmyRequest { body, jwt } = request;
 
             match method {
-                Method::GET => self.client.get(route),
-                Method::POST => self.client.post(route),
-                Method::PUT => self.client.put(route),
+                Method::GET => self.client.get(route).query(&body),
+                Method::POST => self.client.post(route).json(&body),
+                Method::PUT => self.client.put(route).json(&body),
                 _ => unreachable!("This crate does not use other HTTP methods."),
             }
             .with_headers(headers)
             .maybe_with_jwt(jwt)
-            .json(&body)
             .send()
             .await?
             .json::<Response>()
