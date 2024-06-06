@@ -54,6 +54,14 @@ pub struct LemmyClient {
 }
 
 macro_rules! expose_wrapped_fn {
+    ($name:ident, (), $response:ty, $doc:expr) => {
+        #[doc = $doc]
+        pub async fn $name(&self) -> LemmyResult<$response> {
+            self.client
+                .$name(LemmyRequest::empty(), &self.headers)
+                .await
+        }
+    };
     ($name:ident, $form:ty, $response:ty, $doc:expr) => {
         #[doc = $doc]
         pub async fn $name<Request>(&self, request: Request) -> LemmyResult<$response>
