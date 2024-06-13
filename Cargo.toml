@@ -11,7 +11,7 @@ keywords = ["Lemmy", "HTTP-client", "API-wrapper", "fediverse"]
 categories = ["api-bindings", "wasm"]
 
 [dependencies]
-lemmy_api_common = { version="0.19.3" }
+lemmy_api_common = { version="=0.19.3" }
 http = "1.1.0"
 thiserror = "1.0.61"
 leptos = { version="0.6.12", default-features=false, optional=true }
