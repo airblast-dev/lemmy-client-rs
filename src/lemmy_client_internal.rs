@@ -18,9 +18,19 @@ fn build_route(route: &str, ClientOptions { domain, secure }: &ClientOptions) ->
 
 #[cfg(target_family = "wasm")]
 mod goober {
+    use super::{build_route, MaybeWithJwt, WithHeaders};
+    use crate::{
+        form::LemmyForm,
+        lemmy_client_trait::{private_trait, LemmyClientInternal},
+        response::{LemmyResponse, LemmyResult},
+        ClientOptions, LemmyRequest,
+    };
     use gloo_net::http::{Request, RequestBuilder};
+    use http::Method;
+    use std::collections::HashMap;
     use web_sys::wasm_bindgen::UnwrapThrowExt;
-    pub struct Fetch(ClientOptions);
+
+    pub struct Fetch(pub ClientOptions);
 
     impl Fetch {
         pub fn new(options: ClientOptions) -> Self {
@@ -32,7 +42,7 @@ mod goober {
             format!("{}?{}", build_route(path, &self.0), form_str)
         }
 
-        fn client_options(&self) -> &ClientOptions {
+        pub fn client_options(&self) -> &ClientOptions {
             &self.0
         }
     }
@@ -61,7 +71,7 @@ mod goober {
     impl private_trait::LemmyClientInternal for Fetch {
         async fn make_request<Response, Form>(
             &self,
-            method: Method,
+            method: http::Method,
             path: &str,
             request: LemmyRequest<Form>,
             headers: &HashMap<String, String>,
@@ -171,6 +181,10 @@ mod goober {
                 client: reqwest::Client::new(),
                 options,
             }
+        }
+
+        pub fn client_options(&self) -> &ClientOptions {
+            &self.options
         }
     }
 
