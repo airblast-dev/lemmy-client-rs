@@ -110,6 +110,11 @@ impl LemmyClient {
         &mut self.headers
     }
 
+    /// The options that were provided during the initialization of the [`LemmyClient`].
+    pub fn client_options(&self) -> &ClientOptions {
+        &self.client.options
+    }
+
     expose_wrapped_fn!(
         get_site,
         (),

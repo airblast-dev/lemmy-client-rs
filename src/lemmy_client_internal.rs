@@ -31,6 +31,10 @@ mod goober {
             let form_str = serde_urlencoded::to_string(form).unwrap_or_else(|_| path.to_string());
             format!("{}?{}", build_route(path, &self.0), form_str)
         }
+
+        fn client_options(&self) -> &ClientOptions {
+            &self.0
+        }
     }
 
     impl WithHeaders for RequestBuilder {
@@ -158,7 +162,7 @@ mod goober {
 
     pub struct ClientWrapper {
         client: reqwest::Client,
-        options: ClientOptions,
+        pub options: ClientOptions,
     }
 
     impl ClientWrapper {
