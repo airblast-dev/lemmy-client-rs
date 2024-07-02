@@ -213,9 +213,8 @@ mod goober {
             .maybe_with_jwt(jwt)
             .send()
             .await?
-            .json::<Response>()
-            .await
-            .map_err(Into::into)
+            .json::<LemmyResult<Response>>()
+            .await?
         }
     }
 

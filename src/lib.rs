@@ -41,7 +41,7 @@ mod lemmy_client_trait;
 mod response;
 mod utils;
 
-pub use error::Error;
+pub use error::LemmyClientError;
 pub use form::LemmyRequest;
 pub use lemmy_api_common;
 pub use utils::ClientOptions;
