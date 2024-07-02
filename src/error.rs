@@ -7,6 +7,7 @@ use thiserror::Error as ThisError;
 #[derive(Debug, Clone, ThisError, Deserialize)]
 /// An error returned from the API.
 #[error("Lemmy Error: {0}")]
+#[serde(untagged)]
 pub enum LemmyClientError {
     /// Error type returned by Lemmy.
     Lemmy(LemmyErrorType),
