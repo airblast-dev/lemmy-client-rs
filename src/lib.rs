@@ -8,17 +8,19 @@
 //! A Rust HTTP client for Lemmy.
 //! If used when targeting WASM, uses the browser's built-in fetch API to reduce bundle size.
 //! # Example
-//! ```
+//! ```rust
 //! use lemmy_client::{LemmyClient, ClientOptions};
 //!
-//! let client = LemmyClient::new(ClientOptions {
-//!     domain: String::from("lemmy.ml"),
-//!     secure: true
-//! });
+//! async fn get_set() {
+//!     let client = LemmyClient::new(ClientOptions {
+//!         domain: String::from("lemmy.ml"),
+//!         secure: true
+//!     });
 //!
-//! let res = client.get_site(()).await;
+//!     let res = client.get_site().await;
 //!
-//! assert!(res.is_ok());
+//!     assert!(res.is_ok());
+//! }
 //! ```
 use std::collections::HashMap;
 
