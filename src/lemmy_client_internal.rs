@@ -133,12 +133,13 @@ mod goober {
     use std::collections::HashMap;
 
     use http::Method;
+    use serde::Deserialize;
 
     use crate::{
         form::LemmyForm,
         lemmy_client_trait::{private_trait, LemmyClientInternal},
         response::{LemmyResponse, LemmyResult},
-        ClientOptions, LemmyRequest,
+        ClientOptions, LemmyClientError, LemmyRequest,
     };
 
     use super::{build_route, MaybeWithJwt, WithHeaders};
@@ -200,6 +201,22 @@ mod goober {
             Response: LemmyResponse,
             Form: LemmyForm,
         {
+            #[derive(Deserialize, Debug)]
+            #[serde(untagged)]
+            enum MyResult<R> {
+                Ok(R),
+                Err(LemmyClientError),
+            }
+
+            impl<R> From<MyResult<R>> for Result<R, LemmyClientError> {
+                fn from(value: MyResult<R>) -> Self {
+                    match value {
+                        MyResult::Ok(k) => Self::Ok(k),
+                        MyResult::Err(er) => Self::Err(er),
+                    }
+                }
+            }
+
             let route = build_route(path, &self.options);
             let LemmyRequest { body, jwt } = request;
 
@@ -213,8 +230,9 @@ mod goober {
             .maybe_with_jwt(jwt)
             .send()
             .await?
-            .json::<LemmyResult<Response>>()
+            .json::<MyResult<Response>>()
             .await?
+            .into()
         }
     }
 
