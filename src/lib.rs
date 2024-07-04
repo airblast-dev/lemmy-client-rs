@@ -47,6 +47,7 @@ pub use lemmy_api_common;
 pub use utils::ClientOptions;
 
 /// API wrapper for lemmy
+#[derive(Clone)]
 pub struct LemmyClient {
     headers: HashMap<String, String>,
     #[cfg(target_family = "wasm")]

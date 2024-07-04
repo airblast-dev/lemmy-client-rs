@@ -171,6 +171,7 @@ mod goober {
         }
     }
 
+    #[derive(Clone)]
     pub struct ClientWrapper {
         client: reqwest::Client,
         pub options: ClientOptions,
