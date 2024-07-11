@@ -6,10 +6,10 @@ trait WithHeaders {
 }
 
 trait MaybeWithJwt {
-    fn maybe_with_jwt(self, jwt: Option<String>) -> Self;
+    fn maybe_with_jwt(self, jwt: Option<&str>) -> Self;
 }
 
-fn build_route(route: &str, ClientOptions { domain, secure }: &ClientOptions) -> String {
+fn build_route(route: &str, ClientOptions { domain, secure, .. }: &ClientOptions) -> String {
     format!(
         "http{}://{domain}/api/v3/{route}",
         if *secure { "s" } else { "" }
@@ -130,7 +130,7 @@ mod goober {
 
 #[cfg(not(target_family = "wasm"))]
 mod goober {
-    use std::collections::HashMap;
+    use std::{collections::HashMap, sync::Arc};
 
     use http::Method;
     use serde::Deserialize;
@@ -162,7 +162,7 @@ mod goober {
     }
 
     impl MaybeWithJwt for reqwest::RequestBuilder {
-        fn maybe_with_jwt(self, jwt: Option<String>) -> Self {
+        fn maybe_with_jwt(self, jwt: Option<&str>) -> Self {
             if let Some(jwt) = jwt {
                 self.bearer_auth(jwt)
             } else {
@@ -171,17 +171,17 @@ mod goober {
         }
     }
 
-    #[derive(Clone)]
+    #[derive(Clone, Debug)]
     pub struct ClientWrapper {
         client: reqwest::Client,
-        pub options: ClientOptions,
+        pub options: Arc<ClientOptions>,
     }
 
     impl ClientWrapper {
         pub fn new(options: ClientOptions) -> Self {
             Self {
                 client: reqwest::Client::new(),
-                options,
+                options: Arc::new(options),
             }
         }
 
@@ -228,7 +228,7 @@ mod goober {
                 _ => unreachable!("This crate does not use other HTTP methods."),
             }
             .with_headers(headers)
-            .maybe_with_jwt(jwt)
+            .maybe_with_jwt(jwt.as_deref().or(self.options.jwt.as_deref()))
             .send()
             .await?
             .json::<MyResult<Response>>()

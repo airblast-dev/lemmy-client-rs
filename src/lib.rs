@@ -12,17 +12,14 @@
 //! use lemmy_client::{LemmyClient, ClientOptions};
 //!
 //! async fn get_set() {
-//!     let client = LemmyClient::new(ClientOptions {
-//!         domain: String::from("lemmy.ml"),
-//!         secure: true
-//!     });
+//!     let client = LemmyClient::new(ClientOptions::new("lemmy.ml", true));
 //!
 //!     let res = client.get_site().await;
 //!
 //!     assert!(res.is_ok());
 //! }
 //! ```
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::Arc};
 
 use crate::{lemmy_client_trait::LemmyClientInternal, response::LemmyResult};
 use lemmy_api_common::{
@@ -47,9 +44,12 @@ pub use lemmy_api_common;
 pub use utils::ClientOptions;
 
 /// API wrapper for lemmy
-#[derive(Clone)]
+///
+/// Internally uses [`std::sync::Arc`] to store data to make cloning cheap.
+/// Mutable references return by methods (such as [`LemmyClient::headers_mut`])
+#[derive(Clone, Debug)]
 pub struct LemmyClient {
-    headers: HashMap<String, String>,
+    headers: Arc<HashMap<String, String>>,
     #[cfg(target_family = "wasm")]
     client: Fetch,
     #[cfg(not(target_family = "wasm"))]
@@ -81,10 +81,7 @@ impl LemmyClient {
     /// # Examples
     /// ```
     /// use lemmy_client::{LemmyClient, ClientOptions};
-    /// let client = LemmyClient::new(ClientOptions {
-    ///     domain: String::from("lemmy.ml"),
-    ///     secure: true
-    /// });
+    /// let client = LemmyClient::new(ClientOptions::new("lemmy.ml", true));
     /// ```
     pub fn new(options: ClientOptions) -> Self {
         #[cfg(target_family = "wasm")]
@@ -98,7 +95,7 @@ impl LemmyClient {
         {
             Self {
                 client: ClientWrapper::new(options),
-                headers: HashMap::new(),
+                headers: Arc::default(),
             }
         }
     }
@@ -110,12 +107,17 @@ impl LemmyClient {
 
     /// Mutable map of headers that will be included with each request. Use this method if you want to add headers other than the JWT.
     pub fn headers_mut(&mut self) -> &mut HashMap<String, String> {
-        &mut self.headers
+        Arc::make_mut(&mut self.headers)
     }
 
     /// The options that were provided during the initialization of the [`LemmyClient`].
     pub fn client_options(&self) -> &ClientOptions {
         return self.client.client_options();
+    }
+
+    /// Mutable reference to the options that were provided during the initialization of the [`LemmyClient`].
+    pub fn client_options_mut(&mut self) -> &mut ClientOptions {
+        return Arc::make_mut(&mut self.client.options);
     }
 
     expose_wrapped_fn!(

@@ -17,6 +17,8 @@ where
     /// The body to send with the request. Uses [`unit`] for when a body is not required.
     pub body: Body,
     /// The JWT that is used when authorization is required.
+    ///
+    /// Takes precedence over [`crate::utils::ClientOptions`].
     pub jwt: Option<String>,
 }
 
